@@ -17,14 +17,42 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
+    "torch>=2.0.0",
+    "torchaudio>=2.0.0",
+    "torchvision>=0.15.0",
     "lmdeploy",
     "librosa",
     "fastaudiosr @ git+https://github.com/ysharma3501/FlashSR.git",
     "ncodec @ git+https://github.com/ysharma3501/FastBiCodec.git",
     "einops",
-    "onnxruntime-gpu"
+    "onnxruntime-gpu",
+    "omegaconf>=2.3.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/ysharma3501/MiraTTS"
 Issues = "https://github.com/ysharma3501/MiraTTS/issues"
+
+[tool.uv]
+override-dependencies = [
+    "nvidia-nccl-cu12 ; sys_platform == 'linux'",
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu124", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cu124", marker = "sys_platform == 'linux'" },
+]
+torchaudio = [
+    { index = "pytorch-cu124", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cu124", marker = "sys_platform == 'linux'" },
+]
+torchvision = [
+    { index = "pytorch-cu124", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cu124", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true

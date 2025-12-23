@@ -45,6 +45,78 @@ Audio(audio, rate=48000)
 
 Examples can be seen in the [huggingface model](https://huggingface.co/YatharthS/MiraTTS)
 
+## Installation (Windows + CUDA)
+
+### Requirements
+- Python 3.10+
+- CUDA 12.x
+- 6GB+ VRAM
+
+### Setup with uv
+
+1. Clone the repository:
+```bash
+git clone https://github.com/ayutaz/MiraTTS.git
+cd MiraTTS
+```
+
+2. Install dependencies:
+```bash
+uv sync
+```
+
+3. Verify CUDA is available:
+```bash
+uv run python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
+```
+
+### pyproject.toml Configuration
+
+The following settings are required for Windows + CUDA support (already configured in this repository):
+
+```toml
+[tool.uv]
+override-dependencies = [
+    "nvidia-nccl-cu12 ; sys_platform == 'linux'",
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu124", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cu124", marker = "sys_platform == 'linux'" },
+]
+torchaudio = [
+    { index = "pytorch-cu124", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cu124", marker = "sys_platform == 'linux'" },
+]
+torchvision = [
+    { index = "pytorch-cu124", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cu124", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+```
+
+This configuration:
+- Excludes `nvidia-nccl-cu12` on Windows (Linux-only package)
+- Uses PyTorch's official CUDA 12.4 index for torch, torchaudio, and torchvision
+
+### Run
+```bash
+uv run python -c "
+from mira.model import MiraTTS
+mira_tts = MiraTTS('YatharthS/MiraTTS')
+context_tokens = mira_tts.encode_audio('reference.wav')
+audio = mira_tts.generate('Hello world!', context_tokens)
+print('Audio generated successfully!')
+"
+```
+
+## Resources
+
 I recommend reading these 2 blogs to better easily understand LLM tts models and how I optimize them
 - How they work: https://huggingface.co/blog/YatharthS/llm-tts-models
 - How to optimize them: https://huggingface.co/blog/YatharthS/making-neutts-200x-realtime
